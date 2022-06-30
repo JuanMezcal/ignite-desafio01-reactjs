@@ -4,6 +4,10 @@ import '../styles/tasklist.scss'
 
 import { FiTrash, FiCheckSquare } from 'react-icons/fi'
 
+import { v4 as uuid } from 'uuid';
+
+
+
 interface Task {
   id: number;
   title: string;
@@ -16,14 +20,35 @@ export function TaskList() {
 
   function handleCreateNewTask() {
     // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
+    
+    if (newTaskTitle.replace(/\s+/g, '') !== '') {
+      const newTask = {
+        // id: Math.random(),
+        id: uuid(),
+        title: newTaskTitle,
+        isComplete: false,
+      }
+      
+      setTasks([...tasks, newTask]);
+  
+      setNewTaskTitle('');
+    }
   }
 
   function handleToggleTaskCompletion(id: number) {
     // Altere entre `true` ou `false` o campo `isComplete` de uma task com dado ID
+    
+    setTasks(tasks.map((task: Task) => task.id === id ? {
+      ...task,
+      isComplete: !task.isComplete,
+    } : task));
   }
 
   function handleRemoveTask(id: number) {
     // Remova uma task da listagem pelo ID
+
+    setTasks(tasks.filter((item : Task) => item.id !== id));
+
   }
 
   return (
@@ -35,7 +60,7 @@ export function TaskList() {
           <input 
             type="text" 
             placeholder="Adicionar novo todo" 
-            onChange={(e) => setNewTaskTitle(e.target.value)}
+            onChange={(e) => setNewTaskTitle(e.currentTarget.value)}
             value={newTaskTitle}
           />
           <button type="submit" data-testid="add-task-button" onClick={handleCreateNewTask}>
